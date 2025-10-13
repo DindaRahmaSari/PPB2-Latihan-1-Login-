@@ -1,5 +1,6 @@
 package com.example.latihan1
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -97,10 +98,25 @@ class MainActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     Toast.makeText(this, "Login Berhasil", Toast.LENGTH_LONG).show()
+                    toTodoPage()
                 } else {
                     Toast.makeText(this, "Login gagal", Toast.LENGTH_LONG).show()
                 }
             }
+    }
+    fun isAuthenticated(): Boolean {
+        return auth.currentUser != null
+    }
+    override fun onStart() {
+        super.onStart()
+        if (isAuthenticated()) {
+            toTodoPage()
+        }
+    }
+    private fun toTodoPage() {
+        val intent = Intent(this, DindaActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
 }
