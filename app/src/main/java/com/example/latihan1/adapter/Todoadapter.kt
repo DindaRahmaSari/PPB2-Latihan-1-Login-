@@ -9,14 +9,26 @@ import com.example.latihan1.databinding.ItemTodoBinding
 import com.example.latihan1.entity.Todo
 
 class Todoadapter (
-    private val dataset: MutableList<Todo>
+    private val dataset: MutableList<Todo>,
+    private val events : TodoItemEvents
 ) : RecyclerView.Adapter<Todoadapter.CustomViewHolder>() {
+
+    interface  TodoItemEvents {
+        fun onDelete(todo: Todo)
+    }
     inner class CustomViewHolder(val view: ItemTodoBinding)
         : RecyclerView.ViewHolder(view.root) {
 
             fun bindData(item: Todo) {
                 view.title.text = item.title
                 view.description.text = item.description
+
+                view.root.setOnClickListener {
+
+                    events.onDelete(todo = item)
+
+                    true
+                }
             }
         }
 

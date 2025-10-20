@@ -2,11 +2,13 @@ package com.example.latihan1.usecase
 
 import com.example.latihan1.entity.Todo
 import com.google.firebase.Firebase
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
 
 class TodoUseCase {
-    val db = Firebase.firestore
+    val db: FirebaseFirestore = Firebase.firestore
+
 
     suspend fun getTodo(): List<Todo> {
         return try {
@@ -14,22 +16,42 @@ class TodoUseCase {
                 .get()
                 .await()
 
-            // ✅ PERBAIKAN: Lakukan mapping dari dokumen ke objek Todo
-            // .map akan otomatis mengembalikan daftar kosong jika snapshot.isEmpty benar.
             snapshot.documents.map { document ->
-                // Pastikan nama field ("title", "description") sesuai dengan di Firebase
                 Todo(
                     id = document.id,
-                    title = document.getString("title") ?: "", // Gunakan null-check yang aman
-                    description = document.getString("Description") ?: ""
+                    title = document.getString("title") ?: "",
+                    description = document.getString("description") ?: ""
                 )
             }
         } catch (exc: Exception) {
-            // Sebaiknya log error di sini
-            // Log.e("TodoUseCase", "Error fetching todos", exc)
-
-            // Atau tangani error spesifik, tapi untuk saat ini, lempar Exception
             throw Exception("Gagal mengambil data Todo: ${exc.message}")
+        }
+    }
+
+    suspend fun createTodo(todo: Todo): Todo {
+        val data = hashMapOf(
+            "title" to todo.title,
+            "description" to todo.description
+        )
+
+        return try {
+            val docRef = db.collection("Tododinda").add(data).await()
+
+            todo.copy(id = docRef.id)
+        } catch (exc: Exception) {
+            throw Exception("Gagal membuat Todo: ${exc.message}") // Improved error message
+        }
+    }
+
+    suspend fun deleteTodo(id: String) {
+        try {
+            db.collection("Tododinda")
+                .document(id)
+                .delete()
+                .await()
+
+        } catch (exc: Exception) {
+            throw  Exception(exc.message)
         }
     }
 }

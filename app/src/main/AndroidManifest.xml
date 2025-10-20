@@ -13,6 +13,9 @@
         android:theme="@style/Theme.Latihan1"
         tools:targetApi="31">
         <activity
+            android:name=".CreateTodooActivity"
+            android:exported="false" />
+        <activity
             android:name=".DindaActivity"
             android:exported="false" />
         <activity
